@@ -4,6 +4,7 @@ module dynaminc_nft_addr::dynaminc_nft{
     use std::string::{Self,String};
     use std::signer;
     use std::vector;
+    use dynaminc_nft_addr::base64;
     struct ResourceSigner has key{
         cap:SignerCapability
     }
@@ -40,9 +41,27 @@ public fun to_string(value:u64):String{
     string::utf8(buffer)
 }
 
-fun generate_base64_image(){}
-fun generate_base64_metadata(img:String,i:u64):String{
+public fun generate_base64_image(i :u64):String{
+    let image= string::utf8(b"<svg height=\"600\" width=\"400\" fill=\"black\" viewBox=\"0 0 400 600\" xmlns=\"http://www.w3.org/2000/svg\"><style> svg {  background: black; }.small {fill: white; } </style><text x=\"10\" y=\"40\" class=\"small\">Dynamic NFT #");
 
+    string::append(&mut image,to_string(i));
+    string::append(&mut image,string::utf8(b"</text></svg>"));
+
+    let encode= string::utf8(b"data:image/svg+xml;base64,");
+    string::append(&mut encode,base64::encode_string(image));
+    encode
+}
+public fun generate_base64_metadata(img:String,i:u64):String{
+     let metadata= string::utf8(b"{\"name\": \"Test Dynamic NFT #");
+     string::append(&mut metadata,to_string(i));
+     string::append(&mut metadata,string::utf8(b"\",\"description\":\"Testing dynamic NFTs.\",\"image\":\""));
+     string::append(&mut metadata,img);
+     string::append(&mut metadata,string::utf8(b"\"}"));
+     
+
+     let encode= string::utf8(b"data:application/json;base64,");
+     string::append(&mut encode,base64::encode_string(metadata));
+     encode
 }
   public entry fun create_collection(account:&signer) acquires ResourceSigner{
         assert_admin(account);
@@ -82,6 +101,8 @@ fun generate_base64_metadata(img:String,i:u64):String{
     minting_info.index= minting_info.index+1;
 
     let token_mut_config= token::create_token_mutability_config(&vector<bool>[false,false,false,false,false]);
+
+
     // let tokendata_id= token::create_tokendata(
     //     &resource,
     //     minting_info.collection_name,
@@ -91,4 +112,16 @@ fun generate_base64_metadata(img:String,i:u64):String{
     //     uri,
     // );
   }
+
+ #[test]
+ public fun test(){
+   let img= generate_base64_image(1);
+   let uri= generate_base64_metadata(img,1);
+   std::debug::print(&uri);
+
  }
+
+}
+
+ 
+
