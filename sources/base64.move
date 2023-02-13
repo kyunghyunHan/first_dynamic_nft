@@ -1,7 +1,7 @@
 module dynaminc_nft_addr::base64{
  use std::string::{Self,String};
  use std::vector;
- const B64_CHARS:vector<u8> = b"ABCDEFGHIJKLMNOPQRSTUVEXYZabcdefghijklmnopqrstuvwxyz";
+ const B64_CHARS:vector<u8> = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
  public fun b64_encoded_size(l:u64):u64{
     let ret= l;
@@ -61,7 +61,7 @@ public fun b64_decoded_size(str:String):u64{
       let t= 0;
       while (t < elen){
         vector::push_back<u8>(&mut out,0);
-        t= t+1;
+        t= t + 1;
       };
 
 

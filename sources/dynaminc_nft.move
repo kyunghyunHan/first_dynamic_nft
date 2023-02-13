@@ -51,10 +51,10 @@ public fun generate_base64_image(i :u64):String{
     string::append(&mut encode,base64::encode_string(image));
     encode
 }
-public fun generate_base64_metadata(img:String,i:u64):String{
+public fun generate_base64_metadata(img:String,i:u64): String{
      let metadata= string::utf8(b"{\"name\": \"Test Dynamic NFT #");
      string::append(&mut metadata,to_string(i));
-     string::append(&mut metadata,string::utf8(b"\",\"description\":\"Testing dynamic NFTs.\",\"image\":\""));
+     string::append(&mut metadata,string::utf8(b"\",\"description\":\"It\",\"image\":\""));
      string::append(&mut metadata,img);
      string::append(&mut metadata,string::utf8(b"\"}"));
      
@@ -102,15 +102,26 @@ public fun generate_base64_metadata(img:String,i:u64):String{
 
     let token_mut_config= token::create_token_mutability_config(&vector<bool>[false,false,false,false,false]);
 
+    
+    let tokendata_id= token::create_tokendata(
+        &resource,
+        minting_info.collection_name,
+        name,
+        string::utf8(b"This is some bullshit description"),
+        1,
+        uri,
+        @dynaminc_nft_addr,
+        100,
+        5,
+        token_mut_config,
+        vector<String>[],
+        vector<vector<u8>>[],
+        vector<String>[],
+    );
+    token::mint_token(&resource,tokendata_id,1);
 
-    // let tokendata_id= token::create_tokendata(
-    //     &resource,
-    //     minting_info.collection_name,
-    //     name,
-    //     string::utf8(b"This is some bullshit description"),
-    //     1,
-    //     uri,
-    // );
+    let token_id= token::create_token_id_raw(resource_addr,minting_info.collection_name,name,0);
+    token::direct_transfer(&resource,account,token_id,1);
   }
 
  #[test]
